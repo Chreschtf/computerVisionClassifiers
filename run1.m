@@ -3,8 +3,10 @@ clear all;
 trainImg=imageSet('.\training','recursive');
 imgCell={trainImg};
 imgCellLen=length(imgCell);
-imgVector1=zeros(100,256);
-tinyFeature=zeros(1500,256);
+resizeImageDim=16;
+imgVector1=zeros(100,resizeImageDim*resizeImageDim);
+%tinyFeature=zeros(1500,resizeImageDim*resizeImageDim);
+tinyFeature=double.empty;
 for ii=1:15
     for jj=1:100
         imgRead=read(trainImg(ii),jj);
@@ -16,9 +18,9 @@ for ii=1:15
             y_topLeftCorner=yDim-squareDim-floor((yDim-squareDim)/2);
             imgRead=imcrop(imgRead, [y_topLeftCorner,x_topLeftCorner,squareDim,squareDim]);
         end
-        imgResize=imresize(imgRead,[16 16]);
+        imgResize=imresize(imgRead,[resizeImageDim resizeImageDim]);
         imgResize=im2double(imgResize);
-        imgVector = reshape(imgResize,[256,1]);
+        imgVector = reshape(imgResize,[resizeImageDim*resizeImageDim,1]);
         imgVector=imgVector-mean(imgVector);
         imgVector = imgVector/std(imgVector);
         imgVector1(jj,:) = imgVector;
