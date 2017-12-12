@@ -26,12 +26,12 @@ for ii=1:15
     end
     tinyFeature=vertcat(tinyFeature,imgVector1);
 end
+%%
+% minX=min(tinyFeature);
+% maxX=max(tinyFeature);
+meanX=mean(tinyFeature);
+stdX=std(tinyFeature);
+normX=norm(tinyFeature);
+% normImg=(tinyFeature-meanX)./(max(tinyFeature)-min(tinyFeature));
+unitLen=(tinyFeature)/normX;
 
-% %%
-% IM=imgResize;
-% IM=IM-mean(IM);
-% IM=IM/norm(IM);
-% %%
-% IM=IM.*IM;
-% s=sum(sum(IM));
-% disp(sqrt(s));
