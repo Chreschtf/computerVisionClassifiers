@@ -38,7 +38,42 @@ unitLen=(tinyFeature)/normX;
 n=100;
 X=unitLen;
 classLabel={'bedroom','coast','Forest','HighW','industrial','Insidecity','Kitchen','LivingR','Mountain','Office','OpenCont','Store','Street','Suburb','TallB'}';
-Y=[[repmat(classLabel(1),n,1);repmat(classLabel(2),n,1);repmat(classLabel(3),n,1);repmat(classLabel(4),n,1);repmat(classLabel(5),n,1);repmat(classLabel(6),n,1);repmat(classLabel(7),n,1);repmat(classLabel(8),n,1);repmat(classLabel(9),n,1);
-             repmat(classLabel(10),n,1);repmat(classLabel(11),n,1);repmat(classLabel(12),n,1);repmat(classLabel(13),n,1);repmat(classLabel(14),n,1);repmat(classLabel(15),n,1)]];
-Mdl = fitcknn(X,Y,'NumNeighbors',5,'Standardize',1)
+Y=[[repmat(classLabel(1),n,1);repmat(classLabel(2),n,1);repmat(classLabel(3),n,1);
+    repmat(classLabel(4),n,1);repmat(classLabel(5),n,1);repmat(classLabel(6),n,1);
+    repmat(classLabel(7),n,1);repmat(classLabel(8),n,1);repmat(classLabel(9),n,1);
+    repmat(classLabel(10),n,1);repmat(classLabel(11),n,1);repmat(classLabel(12),n,1);
+    repmat(classLabel(13),n,1);repmat(classLabel(14),n,1);repmat(classLabel(15),n,1)]];
+Mdl = fitcknn(X,Y,'NumNeighbors',5)
+label = predict(Mdl,X);
+cvmodel = crossval(Mdl)
+cvmdlloss = kfoldLoss(cvmodel);
+%% Training and Test
+[N, p1] = size(X);
+
+ii = randperm(N);
+Xtr = X(ii(1:(N*5/10)),:);
+ytr = Y(ii(1:(N*5/10)),:);
+
+Xval=X(ii((N*5/10+1):(N*7.5/10)),:);
+Yval=Y(ii((N*5/10+1):(N*7.5/10)),:);
+
+Xts = X(ii(N*7.5/10+1:N),:);
+yts = Y(ii(N*7.5/10+1:N),:);
+
+
+Mdltrx1 = fitcknn(Xtr,ytr,'NumNeighbors',5);
+Mdltrx2 = fitcknn(Xval,Yval,'NumNeighbors',5);
+Mdltrx3 = fitcknn(Xts,yts,'NumNeighbors',5);
+
+
+labeltrx = predict(Mdltrx1,Xtr);
+
+labelval = predict(Mdltrx1, Xval);
+
+labeltst=predict(Mdltrx1,Xts);
+
+%%The classifier predicts incorrectly for (*ans)  training data.
+rloss = resubLoss(Mdltrx)
+
+
 
