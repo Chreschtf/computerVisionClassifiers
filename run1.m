@@ -26,12 +26,19 @@ for ii=1:15
     end
     tinyFeature=vertcat(tinyFeature,imgVector1);
 end
+%%
+% minX=min(tinyFeature);
+% maxX=max(tinyFeature);
+meanX=mean(tinyFeature);
+stdX=std(tinyFeature);
+normX=norm(tinyFeature);
+% normImg=(tinyFeature-meanX)./(max(tinyFeature)-min(tinyFeature));
+unitLen=(tinyFeature)/normX;
+%%
+n=100;
+X=unitLen;
+classLabel={'bedroom','coast','Forest','HighW','industrial','Insidecity','Kitchen','LivingR','Mountain','Office','OpenCont','Store','Street','Suburb','TallB'}';
+Y=[[repmat(classLabel(1),n,1);repmat(classLabel(2),n,1);repmat(classLabel(3),n,1);repmat(classLabel(4),n,1);repmat(classLabel(5),n,1);repmat(classLabel(6),n,1);repmat(classLabel(7),n,1);repmat(classLabel(8),n,1);repmat(classLabel(9),n,1);
+             repmat(classLabel(10),n,1);repmat(classLabel(11),n,1);repmat(classLabel(12),n,1);repmat(classLabel(13),n,1);repmat(classLabel(14),n,1);repmat(classLabel(15),n,1)]];
+Mdl = fitcknn(X,Y,'NumNeighbors',5,'Standardize',1)
 
-% %%
-% IM=imgResize;
-% IM=IM-mean(IM);
-% IM=IM/norm(IM);
-% %%
-% IM=IM.*IM;
-% s=sum(sum(IM));
-% disp(sqrt(s));
