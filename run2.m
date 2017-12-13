@@ -18,10 +18,14 @@ testDir=fullfile('./testing');
 %exts = {'.jpg','.png','.tif'};
 %testImds = imageDatastore(testDir,'FileExtensions',exts);
 testImages=dir(testDir);
-imagePredictions = strings(length(testImages),2);
-for i=3:length(testImages)
+testImagesCell=struct2cell(testImages);
+imageNames=testImagesCell(1,:);
+natSortedImages=natsortfiles(imageNames)';
+%%
+imagePredictions = strings(length(natSortedImages),2);
+for i=3:length(natSortedImages)
     %1 and 2  = . and ..
-    testImageName = testImages(i).name;
+    testImageName = char(natSortedImages(i));%.name;
     img= imread(fullfile(testDir,testImageName));
     [labelIdx, score] = predict(categoryClassifier,img);
     assignedLabel = categoryClassifier.Labels(labelIdx);
