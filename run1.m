@@ -51,28 +51,26 @@ cvmdlloss = kfoldLoss(cvmodel);
 [N, p1] = size(X);
 
 ii = randperm(N);
-Xtr = X(ii(1:(N*5/10)),:);
-ytr = Y(ii(1:(N*5/10)),:);
+%%Training set----> 50%
+imageTrain = X(ii(1:(N*5/10)),:);
+featureTrain = Y(ii(1:(N*5/10)),:);
+%%Validation set-------> 25%
+imageValidation=X(ii((N*5/10+1):(N*7.5/10)),:);
+featureValidation=Y(ii((N*5/10+1):(N*7.5/10)),:);
+%%Test set------->25%
+imageTest = X(ii(N*7.5/10+1:N),:);
+featureTest = Y(ii(N*7.5/10+1:N),:);
 
-Xval=X(ii((N*5/10+1):(N*7.5/10)),:);
-Yval=Y(ii((N*5/10+1):(N*7.5/10)),:);
+%%Knn Classifier 
+Mdltrx1 = fitcknn(imageTrain,featureTrain,'NumNeighbors',5);
+Mdltrx2 = fitcknn(imageValidation,featureValidation,'NumNeighbors',5);
+Mdltrx3 = fitcknn(imageTest,featureTest,'NumNeighbors',5);
+%%Output Prediction
+labeltrain = predict(Mdltrx1,imageTrain);
+labelvalidation = predict(Mdltrx1, imageValidation);
+labeltest=predict(Mdltrx1,imageTest);
 
-Xts = X(ii(N*7.5/10+1:N),:);
-yts = Y(ii(N*7.5/10+1:N),:);
-
-
-Mdltrx1 = fitcknn(Xtr,ytr,'NumNeighbors',5);
-Mdltrx2 = fitcknn(Xval,Yval,'NumNeighbors',5);
-Mdltrx3 = fitcknn(Xts,yts,'NumNeighbors',5);
-
-
-labeltrx = predict(Mdltrx1,Xtr);
-
-labelval = predict(Mdltrx1, Xval);
-
-labeltst=predict(Mdltrx1,Xts);
-
-%%The classifier predicts incorrectly for (*ans)  training data.
+%%The classifier predicts incorrectly classified for (*ans)  training data.
 rloss = resubLoss(Mdltrx)
 
 
