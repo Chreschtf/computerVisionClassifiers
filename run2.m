@@ -1,12 +1,12 @@
-setDir  = fullfile('./training');
-imds = imageDatastore(setDir,'IncludeSubfolders',true,'LabelSource','foldernames');
-[trainingSet,testSet] = splitEachLabel(imds,0.3,'randomize');
+trainingDir  = fullfile('./training');
+images = imageDatastore(trainingDir,'IncludeSubfolders',true,'LabelSource','foldernames');
+[trainingSet,validationSet] = splitEachLabel(images,0.3,'randomize');
 %%
 bag = bagOfFeatures(trainingSet,'Gridstep',[4 4],'BlockWidth',[32]);%,'Verbose',false);   
 %%
 categoryClassifier = trainImageCategoryClassifier(trainingSet,bag);
 %%
-confMatrix = evaluate(categoryClassifier,testSet);
+confMatrix = evaluate(categoryClassifier,validationSet);
 %%
 testDir=fullfile('./testing');
 img = imread(fullfile(testDir,'2.jpg'));
@@ -20,6 +20,7 @@ testDir=fullfile('./testing');
 testImages=dir(testDir);
 testImagesCell=struct2cell(testImages);
 imageNames=testImagesCell(1,:);
+addpath('./3rdPartyPackages/natsort');
 natSortedImages=natsortfiles(imageNames)';
 %%
 imagePredictions = strings(length(natSortedImages),2);
