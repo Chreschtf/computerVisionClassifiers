@@ -1,7 +1,7 @@
 trainingDir  = fullfile('./training');
 images = imageDatastore(trainingDir,'IncludeSubfolders',true,'LabelSource','foldernames');
 addpath('./3rdPartyPackages/grs2rgb');
-images.ReadFcn = @(loc)imresize(grs2rgb(imread(loc)),[227,227]);
+images.ReadFcn = @(loc)imresize(cat(3,imread(loc),imread(loc),imread(loc)),[227,227]);
 [trainingSet,validationSet] = splitEachLabel(images,0.7,'randomized');
 
 %%
@@ -13,11 +13,10 @@ for i = 1:16
     I = readimage(trainingSet,idx(i));
     imshow(I)
 end
-
-
-
 %%
 net = alexnet;
+
+%%
 layersTransfer = net.Layers(1:end-3);
 numClasses = numel(categories(trainingSet.Labels));
 layers = [
@@ -31,18 +30,18 @@ numIterationsPerEpoch = floor(numel(trainingSet.Labels)/miniBatchSize);
 options = trainingOptions('sgdm',...
     'MiniBatchSize',miniBatchSize,...
     'MaxEpochs',4,...
-    'InitialLearnRate',1e-4,...
-    'Verbose',false,...
-    'Plots','training-progress',...
-    'ValidationData',validationSet,...
-    'ValidationFrequency',numIterationsPerEpoch);
+    'InitialLearnRate',1e-4 );
 %%
 netTransfer = trainNetwork(trainingSet,layers,options);
 
 %%
-% addpath('./3rdPartyPackages/grs2rgb');
-% trainImg=imageSet('.\training','recursive');
-% imgRead=read(trainImg(2),2);
-% %imshow(imgRead);
-% res = grs2rgb(imgRead);
-% imshow(res);
+correctPredict=0;
+for i=1:length(validationSet.Files)
+    image = readimage(validationSet,i);
+    label = classify(net,image);
+    if label == validationSet.Labels(i)
+        correctPredict=correctPredict+1;
+    end
+    disp(label);
+end
+
