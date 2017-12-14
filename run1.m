@@ -53,27 +53,25 @@ cvmdlloss = kfoldLoss(cvmodel);
 [N, p1] = size(X);
 
 ii = randperm(N);
-%%Training set----> 50%
-imageTrain = X(ii(1:(N*5/10)),:);
-featureTrain = Y(ii(1:(N*5/10)),:);
-%%Validation set-------> 25%
-imageValidation=X(ii((N*5/10+1):(N*7.5/10)),:);
-featureValidation=Y(ii((N*5/10+1):(N*7.5/10)),:);
-%%Test set------->25%
-imageTest = X(ii(N*7.5/10+1:N),:);
-featureTest = Y(ii(N*7.5/10+1:N),:);
+%%Training set----> 80%
+imageTrain = X(ii(1:(N*8/10)),:);
+featureTrain = Y(ii(1:(N*8/10)),:);
+%%Validation set-------> 20%
+imageValidation=X(ii(N*8/10+1:N),:);
+featureValidation=Y(ii(N*8/10+1:N),:);
 
 %%Knn Classifier 
 Mdltrx1 = fitcknn(imageTrain,featureTrain,'NumNeighbors',5);
-Mdltrx2 = fitcknn(imageValidation,featureValidation,'NumNeighbors',5);
-Mdltrx3 = fitcknn(imageTest,featureTest,'NumNeighbors',5);
+
 %%Output Prediction
 labeltrain = predict(Mdltrx1,imageTrain);
 labelvalidation = predict(Mdltrx1, imageValidation);
-labeltest=predict(Mdltrx1,imageTest);
 
 %%The classifier predicts incorrectly classified for (*ans)  training data.
-rloss = resubLoss(Mdltrx)
-
-
-
+rloss = resubLoss(Mdltrx1)
+%%
+lengthValFeature=length(featureValidation);
+lengthLabelValidation=length(labelvalidation);
+stringComparison=strcmp(featureValidation,labelvalidation);
+totalMatch=sum(stringComparison);
+accuracyValidation=totalMatch/lengthLabelValidation
