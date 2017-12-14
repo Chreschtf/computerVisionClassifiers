@@ -48,6 +48,8 @@ label = predict(Mdl,X);
 cvmodel = crossval(Mdl)
 cvmdlloss = kfoldLoss(cvmodel);
 %% Training and Test
+
+%%On the Training Images 
 [N, p1] = size(X);
 
 ii = randperm(N);
