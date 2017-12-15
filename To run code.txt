@@ -1,0 +1,23 @@
+The following coursework is done using Matlab.
+The files containing the code for implementations are
+	1.run1.m
+	2.run2.m
+	3.run3.m
+Before running these code add the following folder into the path
+	1.3rd Party Packages (natSort matlab)--->sorting of the data
+	2.training image folder(Extracted from zip)
+	3.testing image folder(Extracted from zip)
+
+//---------run1.m----------//
+This m files contains the for tiny features and KNN.
+It could be compiled and run directly.
+The resultant outut is stored in a text file run1.txt
+//---------run2.m----------//
+Contains the implementation of linear classifiers using 
+bag of visual words.
+Before running the code clear the workspace directory.
+After the run the code.Output will be stored in run2.txt
+//---------run3.m----------//
+Classifier
+This code could be run directly after opening.
+Output save in run3.txt
