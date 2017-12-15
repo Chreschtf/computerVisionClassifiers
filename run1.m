@@ -1,13 +1,28 @@
+% This Section of program, contains the code to implement 
+% the RUN1 of the coursework. These following tasks are  
+% carried out 
+% 1. Image Cropping about the center
+% 2. Resize the image to a fixed resolution 16x16 pixels
+% 3. The resultant image are taken as a vector and concatenated into Row
+% 4. Scaling to unit length
+% 5. Implementing KNN Classification
+% 
 clc;
 clear all;
+%Loading of Image dataset into matlab
 trainImg=imageSet('.\training','recursive');
+testImg=imageSet('.\testing','recursive');
+%Section where the variables are initialised and 
+%to implement Image cropping and resizing are done to extract tiny
+%features
 imgCell={trainImg};
-imgCellLen=length(imgCell);
+imgCellLen=length(trainImg);
+totalImginEachfolder=trainImg.Count;
 resizeImageDim=16;
 imgVector1=zeros(100,resizeImageDim*resizeImageDim);
 tinyFeature=double.empty;
-for ii=1:15
-    for jj=1:100
+for ii=1:imgCellLen
+    for jj=1:totalImginEachfolder
         imgRead=read(trainImg(ii),jj);
         ig=imgRead;
         [xDim,yDim]=size(imgRead);
@@ -20,21 +35,22 @@ for ii=1:15
         imgResize=imresize(imgRead,[resizeImageDim resizeImageDim]);
         imgResize=im2double(imgResize);
         imgVector = reshape(imgResize,[resizeImageDim*resizeImageDim,1]);
-        %imgVector=imgVector-mean(imgVector);
-        %imgVector = imgVector/std(imgVector);
         imgVector1(jj,:) = imgVector;
     end
     tinyFeature=vertcat(tinyFeature,imgVector1);
 end
 %%
-% minX=min(tinyFeature);
-% maxX=max(tinyFeature);
+%normalization of the the vector to unit length
 meanX=mean(tinyFeature);
 stdX=std(tinyFeature);
 normX=norm(tinyFeature);
-% normImg=(tinyFeature-meanX)./(max(tinyFeature)-min(tinyFeature));
 unitLen=(tinyFeature)/normX;
 %%
+% Creating the X and Y Parameters where the
+% X represents the Normalized unit vectors of size [1500x256]
+% Y represents the Labels of the classes that are used to classify
+% the images from X. It is of the size [1500x1] which means 15 classes
+% for 100 images from each classes.
 n=100;
 X=unitLen;
 classLabel={'bedroom','coast','Forest','HighW','industrial','Insidecity','Kitchen','LivingR','Mountain','Office','OpenCont','Store','Street','Suburb','TallB'}';
@@ -43,13 +59,18 @@ Y=[[repmat(classLabel(1),n,1);repmat(classLabel(2),n,1);repmat(classLabel(3),n,1
     repmat(classLabel(7),n,1);repmat(classLabel(8),n,1);repmat(classLabel(9),n,1);
     repmat(classLabel(10),n,1);repmat(classLabel(11),n,1);repmat(classLabel(12),n,1);
     repmat(classLabel(13),n,1);repmat(classLabel(14),n,1);repmat(classLabel(15),n,1)]];
-Mdl = fitcknn(X,Y,'NumNeighbors',5)
-label = predict(Mdl,X);
-cvmodel = crossval(Mdl)
-cvmdlloss = kfoldLoss(cvmodel);
+
+
 %% Training and Test
 
-%%On the Training Images 
+% On this following section the images are randomised and later 
+% split into training and validation set. The training set and 
+% validation set are taken in the ratio of 80% and 20%
+% These values are used in the function fitcknn to do the
+% KNN classification where the X,Y and Number of Neighbours are
+% given as input parmeters.
+
+%%On the Training Images
 [N, p1] = size(X);
 
 ii = randperm(N);
@@ -60,18 +81,40 @@ featureTrain = Y(ii(1:(N*8/10)),:);
 imageValidation=X(ii(N*8/10+1:N),:);
 featureValidation=Y(ii(N*8/10+1:N),:);
 
-%%Knn Classifier 
-Mdltrx1 = fitcknn(imageTrain,featureTrain,'NumNeighbors',5);
+%%Knn Classifier
+Mdltrx1 = fitcknn(imageTrain,featureTrain,'NumNeighbors',10);
 
 %%Output Prediction
 labeltrain = predict(Mdltrx1,imageTrain);
 labelvalidation = predict(Mdltrx1, imageValidation);
+% The classifier predicts incorrectly classified form training data
+% Loss of the KNN Claasifier
+L = loss(Mdltrx1,imageTrain,featureTrain)
 
-%%The classifier predicts incorrectly classified for (*ans)  training data.
-rloss = resubLoss(Mdltrx1)
+
 %%
-lengthValFeature=length(featureValidation);
+% To evaluate the performance of the trainined information on the
+% Validation set. As the information in the array are matrix string 
+% comparison is used which gives a logical output for the matching 
+% Labels on the validation set. By taking the sum of all true values 
+% and the total number of data accuracy of the KNN classifiaction
+% is predicted.
 lengthLabelValidation=length(labelvalidation);
 stringComparison=strcmp(featureValidation,labelvalidation);
+
+
 totalMatch=sum(stringComparison);
 accuracyValidation=totalMatch/lengthLabelValidation
+%%
+testDiret=fullfile('./testing');
+testImages1=dir(testDiret);
+testImagesCell1=struct2cell(testImages1);
+imageNames1=testImagesCell1(1,:);
+addpath('./3rdPartyPackages/natsort');
+natSortedImages1=natsortfiles(imageNames1)';
+%%
+fileID1 = fopen('run1.txt','w');
+outputValidation = labelvalidation.';
+textNumber=0:1:lengthLabelValidation;
+fprintf(fileID1,'%s;\n', labelvalidation{:});
+fclose(fileID1);
