@@ -1,17 +1,12 @@
 trainingDir  = fullfile('./training');
 images = imageDatastore(trainingDir,'IncludeSubfolders',true,'LabelSource','foldernames');
-[trainingSet,validationSet] = splitEachLabel(images,0.3,'randomize');
+[trainingSet,validationSet] = splitEachLabel(images,1,'randomize');
 %%
-bag = bagOfFeatures(trainingSet,'Gridstep',[4 4],'BlockWidth',[32]);%,'Verbose',false);   
+bag = bagOfFeatures(trainingSet,'Gridstep',[4 4],'BlockWidth',[32],'VocabularySize',500);%,'Verbose',false);   
 %%
 categoryClassifier = trainImageCategoryClassifier(trainingSet,bag);
 %%
-confMatrix = evaluate(categoryClassifier,validationSet);
-%%
-testDir=fullfile('./testing');
-img = imread(fullfile(testDir,'2.jpg'));
-[labelIdx, score] = predict(categoryClassifier,img);
-categoryClassifier.Labels(labelIdx);
+%confMatrix = evaluate(categoryClassifier,validationSet);
 
 %%
 testDir=fullfile('./testing');
